@@ -1,11 +1,86 @@
-#include <stdlib.h> 
+#include <stdlib.h>
+#include <time.h>
+#include <stdio.h>
+#include "qlearn.h"
 
 #define MAXSTA	100		    // max # of states
 #define MAXACT	100		    // max # of actions
-#define MAXEPI  1000000L    // max # of epics
+#define MAXEPI  1000000     // max # of epics
 int goalstate;
 static int T[MAXSTA][MAXACT];	// transition matrix
 static int R[MAXSTA][MAXACT];	// reward matrix	
+
+void init_Tmatrix()
+{
+    T[0][0] = 0;
+    T[0][1] = 1;
+    T[0][2] = 4;
+    T[0][3] = 0;
+    T[1][0] = 1;
+    T[1][1] = 2;
+    T[1][2] = 5;
+    T[1][3] = 0;
+    T[2][0] = 2;
+    T[2][1] = 3;
+    T[2][2] = 6;
+    T[2][3] = 1;
+    T[3][0] = 3;
+    T[3][1] = 3;
+    T[3][2] = 7;
+    T[3][3] = 2;
+    T[4][0] = 0;
+    T[4][1] = 5;
+    T[4][2] = 4;
+    T[4][3] = 4;
+    T[5][0] = 1;
+    T[5][1] = 6;
+    T[5][2] = 5;
+    T[5][3] = 4;
+    T[6][0] = 2;
+    T[6][1] = 7;
+    T[6][2] = 6;
+    T[6][3] = 5;
+    T[7][0] = 3;
+    T[7][1] = 7;
+    T[7][2] = 7;
+    T[7][3] = 6;
+}
+
+void init_Rmatrix()
+{
+    R[0][0] = -2;
+    R[0][1] = -1;
+    R[0][2] = -1;
+    R[0][3] = -2;
+    R[1][0] = -2;
+    R[1][1] = -1;
+    R[1][2] = -5;
+    R[1][3] = -1;
+    R[2][0] = -2;
+    R[2][1] = -5;
+    R[2][2] = -1;
+    R[2][3] = -1;
+    R[3][0] = -2;
+    R[3][1] = -2;
+    R[3][2] = 10;
+    R[3][3] = -1;
+    R[4][0] = -1;
+    R[4][1] = -5;
+    R[4][2] = -2;
+    R[4][3] = -2;
+    R[5][0] = -1;
+    R[5][1] = -1;
+    R[5][2] = -2;
+    R[5][3] = -1;
+    R[6][0] = -1;
+    R[6][1] = 10;
+    R[6][2] = -2;
+    R[6][2] = -5;
+    R[7][0] = -5;
+    R[7][1] = -2;
+    R[7][2] = -2;
+    R[7][3] = -1;
+}
 
 // Learning cycle within an episode
 float learn_episode (int s0)
@@ -13,6 +88,7 @@ float learn_episode (int s0)
 int s, a, r, snew;
 int steps = 0;
 float err = 0;  // accumulated TD error
+int count = 0;
 
     s = s0;
     while (s != goalstate){
@@ -22,12 +98,14 @@ float err = 0;  // accumulated TD error
         err += ql_updateQ(s, a, r, snew);
         s = snew;
         steps++;
+        //printf("finito ciclo %d\n", count);
+        count++;
     }
     return err/steps;
 }
 
 // Full learn loop
-float qlearn(float eps)
+float qlearn()
 {
 float err;      // average TD error over an episode
 int s0;         // initial state;
@@ -35,11 +113,13 @@ int epic = 0;   // episode counter
     
     do{
         epic++;
-        s0 = get_initial_state();
-        display_environment();
+        s0 = rand()%8;
+        //display_environment();
         err = learn_episode(s0);
-        display_error(epic, err);
+        //display_error(epic, err);
         ql_reduce_exploration();
+        //printf("Fine epoca %d\n", epic);
+        //l_print_Qmatrix();
     } while (epic < MAXEPI);
     return err;
 }
@@ -47,16 +127,21 @@ int epic = 0;   // episode counter
 int main()
 {
     srand(time(NULL));
-    start_grapichs();
+    init_Tmatrix();
+    init_Rmatrix();
+    goalstate = 7;
+    //start_grapichs();
     ql_init(8, 4);  //8 states, 4 actions
     ql_set_learning_rate(0.5);
     ql_set_discount_factor(0.9);
     ql_set_expl_range(1.0, 0.1);
     ql_set_expl_decay(0.95);
-    display_menu();
-    display_param();
-    display_environment();
-    interpreter();
-    end_graphics();
+    //display_menu();
+    //display_param();
+    //display_environment();
+    //interpreter();
+    qlearn();
+    ql_print_Qmatrix();
+    //end_graphics();
     return 0;
 }

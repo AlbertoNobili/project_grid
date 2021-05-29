@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "__config": "c",
+        "__locale": "c",
+        "chrono": "c",
+        "ctime": "c",
+        "iterator": "c",
+        "locale": "c",
+        "algorithm": "c"
+    }
+}
