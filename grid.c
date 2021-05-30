@@ -87,24 +87,26 @@ float learn_episode (int s0)
 {
 int s, a, r, snew;
 int steps = 0;
-float err = 0;  // accumulated TD error
-int count = 0;
+float newerr;
+float err = 0;  // average TD error
+int step = 0;
 
     s = s0;
     while (s != goalstate){
+        step++;
         a = ql_egreedy_policy(s);
         snew = T[s][a];
         r = R[s][a];
-        err += ql_updateQ(s, a, r, snew);
+        newerr = ql_updateQ(s, a, r, snew);
+        err +=  (newerr - err)/step;
         s = snew;
         steps++;
-        //printf("finito ciclo %d\n", count);
-        count++;
+        //printf("finito ciclo %d\n", step);
     }
-    return err/steps;
+    return err;
 }
 
-// Full learn loop
+// Full learning loop
 float qlearn()
 {
 float err;      // average TD error over an episode
