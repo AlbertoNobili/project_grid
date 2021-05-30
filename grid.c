@@ -86,7 +86,6 @@ void init_Rmatrix()
 float learn_episode (int s0)
 {
 int s, a, r, snew;
-int steps = 0;
 float newerr;
 float err = 0;  // average TD error
 int step = 0;
@@ -100,7 +99,6 @@ int step = 0;
         newerr = ql_updateQ(s, a, r, snew);
         err +=  (newerr - err)/step;
         s = snew;
-        steps++;
         //printf("finito ciclo %d\n", step);
     }
     return err;
