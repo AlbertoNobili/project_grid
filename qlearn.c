@@ -57,6 +57,7 @@ int s, a;
 
 	alpha = ALPHA0;
 	gam = GAMMA0;
+	eps_norm = 1.0;
 	eps_ini = EPSINI;
 	eps_fin = EPSFIN;
 	decay = DECAY0;
@@ -86,11 +87,11 @@ void ql_set_expl_decay(float d)
 }
 
 // Reduce exploration
-static float esp_norm = 1.0;
 void ql_reduce_exploration()
 {
 	eps_norm = decay*eps_norm;
 	epsilon = eps_fin + eps_norm*(eps_ini - eps_fin);
+	//printf("Ho ridotto epsilon = %f\n", epsilon);
 }
 
 // Maximum Q value in a given state s
